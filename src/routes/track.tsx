@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Outlet, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search } from "lucide-react";
 
@@ -17,20 +17,43 @@ export const Route = createFileRoute("/track")({
 function TrackPage() {
   const [n, setN] = useState("");
   const nav = useNavigate();
+  const location = useLocation();
+  const isExact = location.pathname === '/track' || location.pathname === '/track/';
+
   return (
-    <section className="bg-navy min-h-[70vh] text-navy-foreground">
-      <div className="container-wide py-24">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gold">Track</p>
-        <h1 className="mt-3 font-display text-4xl font-bold sm:text-6xl">Where is my cargo?</h1>
-        <p className="mt-4 max-w-xl text-navy-foreground/80">Enter your Zipco tracking number to see live location, milestones and estimated delivery.</p>
-        <form onSubmit={(e) => { e.preventDefault(); if (n.trim()) nav({ to: "/track/$number", params: { number: n.trim() } }); }} className="mt-8 flex max-w-xl flex-col gap-3 rounded-xl bg-white/10 p-3 backdrop-blur sm:flex-row">
-          <div className="flex flex-1 items-center gap-3 rounded-lg bg-white px-4 py-3 text-foreground">
-            <Search className="h-5 w-5 text-muted-foreground" />
-            <input value={n} onChange={(e) => setN(e.target.value)} placeholder="Tracking number (e.g. ZIP-DEMO-001)" className="flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+    <>
+      {isExact && (
+        <section className="bg-navy min-h-[70vh] text-navy-foreground">
+          <div className="container-wide py-24">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gold">Track</p>
+            <h1 className="mt-3 font-display text-4xl font-bold sm:text-6xl">Where is my cargo?</h1>
+            <p className="mt-4 max-w-xl text-navy-foreground/80">Enter your Zipco tracking number to see live location, milestones and estimated delivery.</p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (n.trim()) nav({ to: "/track/$number", params: { number: n.trim() } });
+              }}
+              className="mt-8 flex max-w-xl flex-col gap-3 rounded-xl bg-white/10 p-3 backdrop-blur sm:flex-row"
+            >
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-navy-foreground/50" />
+                <input
+                  type="text"
+                  placeholder="ZIP-DEMO-001"
+                  value={n}
+                  onChange={(e) => setN(e.target.value)}
+                  className="h-12 w-full rounded-lg bg-white/5 pl-12 pr-4 text-navy-foreground outline-none transition-colors focus:bg-white/10 placeholder:text-navy-foreground/30"
+                />
+              </div>
+              <button type="submit" className="h-12 rounded-lg bg-gold px-8 font-semibold text-navy transition-colors hover:bg-gold-light">
+                Track
+              </button>
+            </form>
           </div>
-          <button className="rounded-lg bg-gradient-gold px-6 py-3 text-sm font-semibold shadow-gold">Track</button>
-        </form>
-      </div>
-    </section>
+        </section>
+      )}
+      <Outlet />
+    </>
   );
 }
