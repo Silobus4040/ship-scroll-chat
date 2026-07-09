@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { Ship, Plane, Truck, Warehouse, Search, Globe2, Shield, Clock, ArrowRight } from "lucide-react";
 import heroShip from "@/assets/hero-ship.jpg";
@@ -20,14 +20,11 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-
-  // Ship glides forward + slight up motion as user scrolls
-  const shipX = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "35%"]);
-  const shipY = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "-8%"]);
-  const shipScale = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [1, 1.08]);
-  const waterY = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "20%"]);
+  const shipX = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const shipY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
+  const shipScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const waterY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const overlay = useTransform(scrollYProgress, [0, 1], [0.35, 0.85]);
 
   const [track, setTrack] = useState("");
@@ -62,13 +59,11 @@ function HomePage() {
           aria-hidden
         />
         {/* Subtle animated wave line at bottom */}
-        {!reduce && (
-          <motion.div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-navy to-transparent"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}
-            aria-hidden
-          />
-        )}
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-navy to-transparent"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}
+          aria-hidden
+        />
 
         <div className="relative z-10 container-wide flex h-full flex-col justify-center text-navy-foreground">
           <motion.p

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Ship, MapPin, CheckCircle2, Circle, Package, Clock } from "lucide-react";
 
-export const Route = createFileRoute("/track_/$number")({
+export const Route = createFileRoute("/track/$number")({
   head: ({ params }) => ({
     meta: [
       { title: `Tracking ${params.number} — Zipco International` },
