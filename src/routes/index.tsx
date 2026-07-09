@@ -96,7 +96,7 @@ function HomePage() {
               <input
                 value={track}
                 onChange={(e) => setTrack(e.target.value)}
-                placeholder="Enter tracking number (e.g. ZIP-DEMO-001)"
+                placeholder="Enter tracking number (e.g. ZIP-000)"
                 className="flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>

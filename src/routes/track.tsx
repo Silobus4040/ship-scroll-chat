@@ -40,7 +40,7 @@ function TrackPage() {
                 <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-navy-foreground/50" />
                 <input
                   type="text"
-                  placeholder="ZIP-DEMO-001"
+                  placeholder="ZIP-000"
                   value={n}
                   onChange={(e) => setN(e.target.value)}
                   className="h-12 w-full rounded-lg bg-white/5 pl-12 pr-4 text-navy-foreground outline-none transition-colors focus:bg-white/10 placeholder:text-navy-foreground/30"
