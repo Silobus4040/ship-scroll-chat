@@ -9,38 +9,274 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrackRouteImport } from './routes/track'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as QuoteRouteImport } from './routes/quote'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TrackNumberRouteImport } from './routes/track.$number'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as ApiPublicChatIncomingRouteImport } from './routes/api/public/chat/incoming'
+import { Route as AuthenticatedAdminShipmentsNewRouteImport } from './routes/_authenticated/admin.shipments.new'
+import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
 
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuoteRoute = QuoteRouteImport.update({
+  id: '/quote',
+  path: '/quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrackNumberRoute = TrackNumberRouteImport.update({
+  id: '/$number',
+  path: '/$number',
+  getParentRoute: () => TrackRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicChatIncomingRoute = ApiPublicChatIncomingRouteImport.update({
+  id: '/api/public/chat/incoming',
+  path: '/api/public/chat/incoming',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminShipmentsNewRoute =
+  AuthenticatedAdminShipmentsNewRouteImport.update({
+    id: '/shipments/new',
+    path: '/shipments/new',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminShipmentsIdRoute =
+  AuthenticatedAdminShipmentsIdRouteImport.update({
+    id: '/shipments/$id',
+    path: '/shipments/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/quote': typeof QuoteRoute
+  '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/track': typeof TrackRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/track/$number': typeof TrackNumberRoute
+  '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
+  '/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
+  '/api/public/chat/incoming': typeof ApiPublicChatIncomingRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/quote': typeof QuoteRoute
+  '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/track': typeof TrackRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/track/$number': typeof TrackNumberRoute
+  '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
+  '/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
+  '/api/public/chat/incoming': typeof ApiPublicChatIncomingRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/quote': typeof QuoteRoute
+  '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/track': typeof TrackRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/track/$number': typeof TrackNumberRoute
+  '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
+  '/_authenticated/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
+  '/api/public/chat/incoming': typeof ApiPublicChatIncomingRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/quote'
+    | '/services'
+    | '/sitemap.xml'
+    | '/track'
+    | '/admin'
+    | '/track/$number'
+    | '/admin/shipments/$id'
+    | '/admin/shipments/new'
+    | '/api/public/chat/incoming'
+    | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/quote'
+    | '/services'
+    | '/sitemap.xml'
+    | '/track'
+    | '/admin'
+    | '/track/$number'
+    | '/admin/shipments/$id'
+    | '/admin/shipments/new'
+    | '/api/public/chat/incoming'
+    | '/api/public/telegram/webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/quote'
+    | '/services'
+    | '/sitemap.xml'
+    | '/track'
+    | '/_authenticated/admin'
+    | '/track/$number'
+    | '/_authenticated/admin/shipments/$id'
+    | '/_authenticated/admin/shipments/new'
+    | '/api/public/chat/incoming'
+    | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
+  QuoteRoute: typeof QuoteRoute
+  ServicesRoute: typeof ServicesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TrackRoute: typeof TrackRouteWithChildren
+  ApiPublicChatIncomingRoute: typeof ApiPublicChatIncomingRoute
+  ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quote': {
+      id: '/quote'
+      path: '/quote'
+      fullPath: '/quote'
+      preLoaderRoute: typeof QuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +284,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/track/$number': {
+      id: '/track/$number'
+      path: '/$number'
+      fullPath: '/track/$number'
+      preLoaderRoute: typeof TrackNumberRouteImport
+      parentRoute: typeof TrackRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/chat/incoming': {
+      id: '/api/public/chat/incoming'
+      path: '/api/public/chat/incoming'
+      fullPath: '/api/public/chat/incoming'
+      preLoaderRoute: typeof ApiPublicChatIncomingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/shipments/new': {
+      id: '/_authenticated/admin/shipments/new'
+      path: '/shipments/new'
+      fullPath: '/admin/shipments/new'
+      preLoaderRoute: typeof AuthenticatedAdminShipmentsNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/shipments/$id': {
+      id: '/_authenticated/admin/shipments/$id'
+      path: '/shipments/$id'
+      fullPath: '/admin/shipments/$id'
+      preLoaderRoute: typeof AuthenticatedAdminShipmentsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminShipmentsIdRoute: typeof AuthenticatedAdminShipmentsIdRoute
+  AuthenticatedAdminShipmentsNewRoute: typeof AuthenticatedAdminShipmentsNewRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminShipmentsIdRoute: AuthenticatedAdminShipmentsIdRoute,
+  AuthenticatedAdminShipmentsNewRoute: AuthenticatedAdminShipmentsNewRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface TrackRouteChildren {
+  TrackNumberRoute: typeof TrackNumberRoute
+}
+
+const TrackRouteChildren: TrackRouteChildren = {
+  TrackNumberRoute: TrackNumberRoute,
+}
+
+const TrackRouteWithChildren = TrackRoute._addFileChildren(TrackRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
+  AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
+  QuoteRoute: QuoteRoute,
+  ServicesRoute: ServicesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TrackRoute: TrackRouteWithChildren,
+  ApiPublicChatIncomingRoute: ApiPublicChatIncomingRoute,
+  ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
