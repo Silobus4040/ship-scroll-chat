@@ -18,7 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TrackNumberRouteImport } from './routes/track.$number'
+import { Route as TrackNumberRouteImport } from './routes/track_.$number'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicChatIncomingRouteImport } from './routes/api/public/chat/incoming'
@@ -70,9 +70,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackNumberRoute = TrackNumberRouteImport.update({
-  id: '/$number',
-  path: '/$number',
-  getParentRoute: () => TrackRoute,
+  id: '/track_/$number',
+  path: '/track/$number',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
@@ -111,7 +111,7 @@ export interface FileRoutesByFullPath {
   '/quote': typeof QuoteRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/track': typeof TrackRouteWithChildren
+  '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/track/$number': typeof TrackNumberRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
@@ -127,7 +127,7 @@ export interface FileRoutesByTo {
   '/quote': typeof QuoteRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/track': typeof TrackRouteWithChildren
+  '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/track/$number': typeof TrackNumberRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
@@ -145,9 +145,9 @@ export interface FileRoutesById {
   '/quote': typeof QuoteRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/track': typeof TrackRouteWithChildren
+  '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/track/$number': typeof TrackNumberRoute
+  '/track_/$number': typeof TrackNumberRoute
   '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/_authenticated/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
   '/api/public/chat/incoming': typeof ApiPublicChatIncomingRoute
@@ -198,7 +198,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/track'
     | '/_authenticated/admin'
-    | '/track/$number'
+    | '/track_/$number'
     | '/_authenticated/admin/shipments/$id'
     | '/_authenticated/admin/shipments/new'
     | '/api/public/chat/incoming'
@@ -214,7 +214,8 @@ export interface RootRouteChildren {
   QuoteRoute: typeof QuoteRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TrackRoute: typeof TrackRouteWithChildren
+  TrackRoute: typeof TrackRoute
+  TrackNumberRoute: typeof TrackNumberRoute
   ApiPublicChatIncomingRoute: typeof ApiPublicChatIncomingRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
@@ -284,12 +285,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/track/$number': {
-      id: '/track/$number'
-      path: '/$number'
+    '/track_/$number': {
+      id: '/track_/$number'
+      path: '/track/$number'
       fullPath: '/track/$number'
       preLoaderRoute: typeof TrackNumberRouteImport
-      parentRoute: typeof TrackRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -353,16 +354,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface TrackRouteChildren {
-  TrackNumberRoute: typeof TrackNumberRoute
-}
-
-const TrackRouteChildren: TrackRouteChildren = {
-  TrackNumberRoute: TrackNumberRoute,
-}
-
-const TrackRouteWithChildren = TrackRoute._addFileChildren(TrackRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -372,10 +363,21 @@ const rootRouteChildren: RootRouteChildren = {
   QuoteRoute: QuoteRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TrackRoute: TrackRouteWithChildren,
+  TrackRoute: TrackRoute,
+  TrackNumberRoute: TrackNumberRoute,
   ApiPublicChatIncomingRoute: ApiPublicChatIncomingRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
