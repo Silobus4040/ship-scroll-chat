@@ -5,9 +5,7 @@ import { toast } from "sonner";
 import { Ship, Plus, LogOut, MessageSquare, FileText, Trash2, Shield } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({
-    meta: [{ title: "Admin Dashboard — Zipco", name: "robots", content: "noindex" } as any],
-  }),
+  head: () => ({ meta: [{ title: "Admin Dashboard — Zipco" }, { name: "robots", content: "noindex" }] }),
   component: AdminPage,
 });
 
