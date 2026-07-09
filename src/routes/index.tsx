@@ -10,8 +10,8 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Zipco International — Global Freight & Delivery Services" },
       { name: "description", content: "Ocean, air and land freight solutions from Zipco International. Real-time tracking, dedicated support, worldwide reach." },
-      { property: "og:title", content: "Zipco International — Global Freight" },
-      { property: "og:description", content: "Ocean, air and land freight solutions with real-time tracking." },
+      { property: "og:title", content: "Zipco International — Global Freight & Delivery Services" },
+      { property: "og:description", content: "Ocean, air and land freight solutions from Zipco International. Real-time tracking, dedicated support, worldwide reach." },
       { property: "og:image", content: heroShip },
     ],
   }),
