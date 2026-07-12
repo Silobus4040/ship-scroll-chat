@@ -91,10 +91,14 @@ function RootShell({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-              (function(){
-                // TODO: Replace YOUR_TAWK_PROPERTY_ID with your actual Tawk.to property ID
-                var tawkId = 'YOUR_TAWK_PROPERTY_ID';
-                if (tawkId === 'YOUR_TAWK_PROPERTY_ID') return;
+(function(){
+  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+  s1.async=true;
+  s1.src='https://embed.tawk.to/6a52e0c899e61d1d501eda0f/1jt9rs3ol';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
+  s0.parentNode.insertBefore(s1,s0);
+})();
                 
                 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
                 s1.async=true;
