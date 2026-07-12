@@ -1,8 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, Ship } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import type { User } from "@supabase/supabase-js";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -15,14 +13,7 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setUser(s?.user ?? null));
-    return () => sub.subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -56,15 +47,6 @@ export function Header() {
               {n.label}
             </Link>
           ))}
-          {user ? (
-            <Link to="/admin" className="ml-2 rounded-md bg-gradient-gold px-4 py-2 text-sm font-semibold shadow-gold">
-              Dashboard
-            </Link>
-          ) : (
-            <Link to="/auth" className="ml-2 rounded-md border border-gold/40 px-4 py-2 text-sm font-semibold text-gold hover:bg-gold/10">
-              Admin
-            </Link>
-          )}
         </nav>
 
         <button onClick={() => setOpen(!open)} className="lg:hidden text-navy-foreground p-2" aria-label="Menu">
@@ -80,9 +62,6 @@ export function Header() {
                 {n.label}
               </Link>
             ))}
-            <Link to={user ? "/admin" : "/auth"} onClick={() => setOpen(false)} className="mt-2 rounded-md bg-gradient-gold px-4 py-3 text-center text-sm font-semibold">
-              {user ? "Dashboard" : "Admin Login"}
-            </Link>
           </nav>
         </div>
       )}
