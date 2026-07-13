@@ -29,7 +29,7 @@ Output ONLY a valid JSON array (or the error JSON object), with no markdown form
       "X-Title": "Zipco Admin Route AI",
     },
     body: JSON.stringify({
-      model: "openai/gpt-4o-mini",
+      model: "perplexity/llama-3.1-sonar-large-128k-online",
       messages: [{ role: "user", content: prompt }]
     })
   });
