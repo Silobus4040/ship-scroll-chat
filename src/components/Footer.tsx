@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Ship, Mail, Phone, MapPin } from "lucide-react";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export function Footer() {
+  const s = useSiteSettings();
+
   return (
     <footer className="bg-navy text-navy-foreground">
       <div className="container-wide grid gap-10 py-14 md:grid-cols-4">
@@ -40,9 +43,9 @@ export function Footer() {
         <div>
           <h4 className="font-display text-sm font-bold text-gold">Contact</h4>
           <ul className="mt-4 space-y-3 text-sm text-navy-foreground/75">
-            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0 text-gold" />1200 Harbor Drive, Long Beach, CA 90802</li>
-            <li className="flex items-start gap-2"><Phone className="h-4 w-4 mt-0.5 shrink-0 text-gold" />+1 (555) 947-2600</li>
-            <li className="flex items-start gap-2"><Mail className="h-4 w-4 mt-0.5 shrink-0 text-gold" />ops@zipco-intl.com</li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0 text-gold" />{s.contact_address}</li>
+            <li className="flex items-start gap-2"><Phone className="h-4 w-4 mt-0.5 shrink-0 text-gold" />{s.contact_phone}</li>
+            <li className="flex items-start gap-2"><Mail className="h-4 w-4 mt-0.5 shrink-0 text-gold" />{s.contact_email}</li>
           </ul>
         </div>
       </div>

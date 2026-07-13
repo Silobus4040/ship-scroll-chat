@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -21,6 +22,8 @@ const offices = [
 ];
 
 function ContactPage() {
+  const s = useSiteSettings();
+
   return (
     <>
       <section className="bg-navy py-20 text-navy-foreground">
@@ -34,9 +37,9 @@ function ContactPage() {
       <section className="container-wide py-20">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: Phone, label: "Call us", value: "+1 (555) 947-2600" },
-            { icon: Mail, label: "Email", value: "ops@zipco-intl.com" },
-            { icon: MapPin, label: "Headquarters", value: "Long Beach, California" },
+            { icon: Phone, label: "Call us", value: s.contact_phone },
+            { icon: Mail, label: "Email", value: s.contact_email },
+            { icon: MapPin, label: "Headquarters", value: s.headquarters_label },
             { icon: Clock, label: "Hours", value: "24 / 7 / 365" },
           ].map((c) => (
             <div key={c.label} className="rounded-xl border bg-card p-6">

@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Ship, Plus, LogOut, MessageSquare, FileText, Trash2, Shield } from "lucide-react";
+import { Ship, Plus, LogOut, MessageSquare, FileText, Trash2, Shield, Settings, KeyRound, MapPin, Phone, Mail, Save } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin Dashboard — Zipco" }, { name: "robots", content: "noindex" }] }),
@@ -16,7 +16,7 @@ type Session = { id: string; visitor_name: string | null; visitor_email: string 
 function AdminPage() {
   const nav = useNavigate();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [tab, setTab] = useState<"shipments" | "quotes" | "chats">("shipments");
+  const [tab, setTab] = useState<"shipments" | "quotes" | "chats" | "settings">("shipments");
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -91,9 +91,9 @@ function AdminPage() {
         </div>
       </div>
 
-      <div className="mt-6 flex gap-1 border-b">
-        {([["shipments", Ship, `Shipments (${shipments.length})`], ["quotes", FileText, `Quotes (${quotes.length})`], ["chats", MessageSquare, `Chats (${sessions.length})`]] as const).map(([id, Icon, label]) => (
-          <button key={id} onClick={() => setTab(id)} className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium ${tab === id ? "border-accent text-accent" : "border-transparent text-muted-foreground"}`}>
+      <div className="mt-6 flex gap-1 border-b overflow-x-auto">
+        {([["shipments", Ship, `Shipments (${shipments.length})`], ["quotes", FileText, `Quotes (${quotes.length})`], ["chats", MessageSquare, `Chats (${sessions.length})`], ["settings", Settings, "Settings"]] as const).map(([id, Icon, label]) => (
+          <button key={id} onClick={() => setTab(id)} className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium whitespace-nowrap ${tab === id ? "border-accent text-accent" : "border-transparent text-muted-foreground"}`}>
             <Icon className="h-4 w-4" />{label}
           </button>
         ))}
@@ -160,7 +160,144 @@ function AdminPage() {
             {sessions.length === 0 && <p className="p-8 text-center text-muted-foreground">No chat sessions yet.</p>}
           </div>
         )}
+
+        {tab === "settings" && <SettingsPanel />}
       </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────── */
+/*  Settings Panel                            */
+/* ────────────────────────────────────────── */
+function SettingsPanel() {
+  // Password change
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
+
+  // Site settings
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [hqLabel, setHqLabel] = useState("");
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [ssSaving, setSsSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("site_settings" as any)
+      .select("*")
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          const d = data as any;
+          setSettingsId(d.id);
+          setAddress(d.contact_address);
+          setPhone(d.contact_phone);
+          setEmail(d.contact_email);
+          setHqLabel(d.headquarters_label);
+        }
+        setLoaded(true);
+      });
+  }, []);
+
+  async function changePassword() {
+    if (newPw.length < 6) { toast.error("New password must be at least 6 characters"); return; }
+    if (newPw !== confirmPw) { toast.error("Passwords do not match"); return; }
+    setPwSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: newPw });
+    setPwSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Password updated successfully!");
+    setCurrentPw(""); setNewPw(""); setConfirmPw("");
+  }
+
+  async function saveSiteSettings() {
+    if (!settingsId) { toast.error("Settings not loaded yet"); return; }
+    setSsSaving(true);
+    const { error } = await supabase
+      .from("site_settings" as any)
+      .update({
+        contact_address: address,
+        contact_phone: phone,
+        contact_email: email,
+        headquarters_label: hqLabel,
+      } as any)
+      .eq("id", settingsId);
+    setSsSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Contact info updated! Changes are live now.");
+  }
+
+  return (
+    <div className="max-w-2xl space-y-8">
+      {/* Password */}
+      <section className="rounded-2xl border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent/15 text-accent"><KeyRound className="h-5 w-5" /></span>
+          <div>
+            <h2 className="font-display text-lg font-bold">Change Password</h2>
+            <p className="text-xs text-muted-foreground">Update your admin login password</p>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium">Current Password</label>
+            <input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="••••••••" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">New Password</label>
+            <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="At least 6 characters" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Confirm New Password</label>
+            <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="Re-enter new password" />
+          </div>
+          <button onClick={changePassword} disabled={pwSaving || !newPw} className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">
+            {pwSaving ? "Updating…" : "Update Password"}
+          </button>
+        </div>
+      </section>
+
+      {/* Site Contact Info */}
+      <section className="rounded-2xl border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-accent/15 text-accent"><MapPin className="h-5 w-5" /></span>
+          <div>
+            <h2 className="font-display text-lg font-bold">Contact Information</h2>
+            <p className="text-xs text-muted-foreground">Shown in the footer and contact page across the entire website</p>
+          </div>
+        </div>
+        {!loaded ? (
+          <p className="text-sm text-muted-foreground">Loading settings…</p>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium"><MapPin className="h-4 w-4 text-muted-foreground" />Address</label>
+              <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium"><Phone className="h-4 w-4 text-muted-foreground" />Phone Number</label>
+              <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium"><Mail className="h-4 w-4 text-muted-foreground" />Email</label>
+              <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium"><MapPin className="h-4 w-4 text-muted-foreground" />Headquarters Label</label>
+              <input type="text" value={hqLabel} onChange={(e) => setHqLabel(e.target.value)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="e.g. Long Beach, California" />
+            </div>
+            <button onClick={saveSiteSettings} disabled={ssSaving} className="inline-flex items-center gap-2 rounded-lg bg-gradient-gold px-5 py-2.5 text-sm font-semibold shadow-gold disabled:opacity-50">
+              <Save className="h-4 w-4" />{ssSaving ? "Saving…" : "Save Contact Info"}
+            </button>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
