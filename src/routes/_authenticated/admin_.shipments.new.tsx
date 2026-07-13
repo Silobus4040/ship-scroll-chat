@@ -73,7 +73,7 @@ function NewShipmentPage() {
     setGeneratingAI(true);
     toast.info("AI Route Agent is analyzing logistics...");
     try {
-      const generated = await generateRouteEvents(origin, dest, type);
+      const generated = await generateRouteEvents({ data: { origin, destination: dest, serviceType: type } });
       if (Array.isArray(generated) && generated.length > 0) {
         setEvents(generated.map(g => ({
           status: g.status || "Item Processed at Origin Warehouse",
