@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ const STATUS_TEMPLATES = [
 
 function NewShipmentPage() {
   const nav = useNavigate();
+  const generateRouteEventsFn = useServerFn(generateRouteEvents);
   const [saving, setSaving] = useState(false);
   const [events, setEvents] = useState<EventRow[]>([
     { status: "Item Processed at Origin Warehouse", location: "", description: "", event_time: new Date().toISOString().slice(0, 16) },
@@ -73,7 +75,7 @@ function NewShipmentPage() {
     setGeneratingAI(true);
     toast.info("AI Route Agent is analyzing logistics...");
     try {
-      const generated = await generateRouteEvents({ data: { origin, destination: dest, serviceType: type } });
+      const generated = await generateRouteEventsFn({ data: { origin, destination: dest, serviceType: type } });
       if (Array.isArray(generated) && generated.length > 0) {
         setEvents(generated.map(g => ({
           status: g.status || "Item Processed at Origin Warehouse",
