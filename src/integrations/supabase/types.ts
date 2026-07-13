@@ -225,6 +225,33 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          contact_address: string
+          contact_email: string
+          contact_phone: string
+          headquarters_label: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          contact_address?: string
+          contact_email?: string
+          contact_phone?: string
+          headquarters_label?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_address?: string
+          contact_email?: string
+          contact_phone?: string
+          headquarters_label?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
