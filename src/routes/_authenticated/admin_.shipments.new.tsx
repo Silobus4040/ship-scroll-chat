@@ -24,6 +24,21 @@ const STATUS_TEMPLATES = [
   "Arrived at Destination Port",
   "Out for Delivery",
   "Delivered",
+  "DELAYED",
+  "MOVING",
+  "STOP",
+  "FLIGHT CHANGE",
+  "FLIGHT CHANGE CHARGES",
+  "SHIPMENT CHANGE",
+  "SHIPMENT CHANGE CHARGES",
+  "CUSTOM IMPOUND",
+  "CUSTOM IMPOUND CHARGES",
+  "ANTI MONEY LAUNDERING CLEARANCE",
+  "CLEARANCE FEE",
+  "INVESTIGATION",
+  "Final FBI Clearance",
+  "FBI IMPOUND",
+  "FBI IMPOUND CHARGES"
 ];
 
 function NewShipmentPage() {
@@ -128,7 +143,11 @@ function NewShipmentPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <label className="block text-xs font-medium text-muted-foreground">Status</label>
-                    <input list="status-templates" value={ev.status} onChange={(e) => updateEvent(i, "status", e.target.value)} className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" placeholder="e.g. Departed Port" />
+                    <select value={ev.status} onChange={(e) => updateEvent(i, "status", e.target.value)} className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm">
+                      <option value="" disabled>Select status...</option>
+                      {STATUS_TEMPLATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      {ev.status && !STATUS_TEMPLATES.includes(ev.status) && <option value={ev.status}>{ev.status}</option>}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-muted-foreground">Location</label>
@@ -150,7 +169,6 @@ function NewShipmentPage() {
             ))}
           </div>
           <datalist id="status-templates">
-            {STATUS_TEMPLATES.map((s) => <option key={s} value={s} />)}
           </datalist>
         </section>
 

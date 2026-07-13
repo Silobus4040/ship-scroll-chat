@@ -11,6 +11,35 @@ export const Route = createFileRoute("/_authenticated/admin_/shipments/$id")({
 
 type EventRow = { id?: string; status: string; location: string; description: string; event_time: string };
 
+const STATUS_TEMPLATES = [
+  "Item Processed at Origin Warehouse",
+  "Picked up by Carrier",
+  "Departed Origin Port",
+  "In Transit via Ocean Freight",
+  "In Transit via Air Freight",
+  "Arrived at Transit Hub",
+  "Customs Clearance in Progress",
+  "Customs Released",
+  "Arrived at Destination Port",
+  "Out for Delivery",
+  "Delivered",
+  "DELAYED",
+  "MOVING",
+  "STOP",
+  "FLIGHT CHANGE",
+  "FLIGHT CHANGE CHARGES",
+  "SHIPMENT CHANGE",
+  "SHIPMENT CHANGE CHARGES",
+  "CUSTOM IMPOUND",
+  "CUSTOM IMPOUND CHARGES",
+  "ANTI MONEY LAUNDERING CLEARANCE",
+  "CLEARANCE FEE",
+  "INVESTIGATION",
+  "Final FBI Clearance",
+  "FBI IMPOUND",
+  "FBI IMPOUND CHARGES"
+];
+
 function EditShipmentPage() {
   const { id } = Route.useParams();
   const nav = useNavigate();
@@ -88,7 +117,14 @@ function EditShipmentPage() {
           {events.map((ev, i) => (
             <div key={i} className="rounded-xl border p-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <FI label="Status" value={ev.status} onChange={(v) => setEvents((e) => e.map((r, idx) => idx === i ? { ...r, status: v } : r))} />
+                <div>
+                  <label className="block text-sm font-medium">Status</label>
+                  <select value={ev.status} onChange={(e) => setEvents((evs) => evs.map((r, idx) => idx === i ? { ...r, status: e.target.value } : r))} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm">
+                    <option value="" disabled>Select status...</option>
+                    {STATUS_TEMPLATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {ev.status && !STATUS_TEMPLATES.includes(ev.status) && <option value={ev.status}>{ev.status}</option>}
+                  </select>
+                </div>
                 <FI label="Location" value={ev.location} onChange={(v) => setEvents((e) => e.map((r, idx) => idx === i ? { ...r, location: v } : r))} />
                 <FI label="Timestamp" type="datetime-local" value={ev.event_time} onChange={(v) => setEvents((e) => e.map((r, idx) => idx === i ? { ...r, event_time: v } : r))} />
                 <FI label="Description" value={ev.description} onChange={(v) => setEvents((e) => e.map((r, idx) => idx === i ? { ...r, description: v } : r))} />
