@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { generateRouteEvents } from "@/lib/ai";
 
 export const Route = createFileRoute("/_authenticated/admin_/shipments/$id")({
   head: () => ({ meta: [{ title: "Edit Shipment — Zipco Admin" }, { name: "robots", content: "noindex" }] }),
@@ -46,6 +47,7 @@ function EditShipmentPage() {
   const [shipment, setShipment] = useState<any>(null);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [saving, setSaving] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   useEffect(() => {
     supabase.from("shipments").select("*").eq("id", id).maybeSingle().then(({ data }) => setShipment(data));
@@ -87,6 +89,31 @@ function EditShipmentPage() {
     nav({ to: "/admin" });
   }
 
+  async function handleAIGenerate() {
+    if (!shipment.origin || !shipment.destination) {
+      toast.error("Please ensure Origin and Destination are set first!");
+      return;
+    }
+    setGeneratingAI(true);
+    toast.info("AI Route Agent is analyzing logistics...");
+    try {
+      const generated = await generateRouteEvents(shipment.origin, shipment.destination, shipment.service_type);
+      if (Array.isArray(generated) && generated.length > 0) {
+        setEvents(generated.map(g => ({
+          status: g.status || "Item Processed at Origin Warehouse",
+          location: g.location || "",
+          description: g.description || "",
+          event_time: g.event_time ? new Date(g.event_time).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16)
+        })));
+        toast.success("AI generated a highly realistic route!");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "AI failed to generate route");
+    } finally {
+      setGeneratingAI(false);
+    }
+  }
+
   return (
     <div className="container-wide py-10 max-w-4xl">
       <Link to="/admin" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />Back</Link>
@@ -109,9 +136,18 @@ function EditShipmentPage() {
       </section>
 
       <section className="mt-6 rounded-2xl border bg-card p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold">Tracking events</h2>
-          <button onClick={() => setEvents((e) => [...e, { status: "", location: "", description: "", event_time: new Date().toISOString().slice(0, 16) }])} className="inline-flex items-center gap-1 rounded-md bg-gradient-gold px-3 py-1.5 text-xs font-semibold"><Plus className="h-3 w-3" />Add</button>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="font-display text-lg font-bold">Tracking events</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Timeline entries shown to customers. Last one becomes current status.</p>
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={handleAIGenerate} disabled={generatingAI} className="inline-flex items-center gap-1.5 rounded-md border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-600 hover:bg-purple-500/20 disabled:opacity-50">
+              {generatingAI ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {generatingAI ? "Agent is routing..." : "Ask AI Agent"}
+            </button>
+            <button onClick={() => setEvents((e) => [...e, { status: "", location: "", description: "", event_time: new Date().toISOString().slice(0, 16) }])} className="inline-flex items-center gap-1 rounded-md bg-gradient-gold px-3 py-1.5 text-xs font-semibold"><Plus className="h-3 w-3" />Add</button>
+          </div>
         </div>
         <div className="mt-4 space-y-4">
           {events.map((ev, i) => (

@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { generateRouteEvents } from "@/lib/ai";
 
 export const Route = createFileRoute("/_authenticated/admin_/shipments/new")({
   head: () => ({ meta: [{ title: "New Shipment — Zipco Admin" }, { name: "robots", content: "noindex" }] }),
@@ -54,6 +55,39 @@ function NewShipmentPage() {
   function removeEvent(i: number) { setEvents((e) => e.filter((_, idx) => idx !== i)); }
   function updateEvent(i: number, k: keyof EventRow, v: string) {
     setEvents((e) => e.map((row, idx) => (idx === i ? { ...row, [k]: v } : row)));
+  }
+
+  const [generatingAI, setGeneratingAI] = useState(false);
+  async function handleAIGenerate() {
+    const form = document.querySelector("form");
+    if (!form) return;
+    const origin = (form.elements.namedItem("origin") as HTMLInputElement).value;
+    const dest = (form.elements.namedItem("destination") as HTMLInputElement).value;
+    const type = (form.elements.namedItem("service_type") as HTMLInputElement).value;
+    
+    if (!origin || !dest) {
+      toast.error("Please enter both Origin and Destination first!");
+      return;
+    }
+
+    setGeneratingAI(true);
+    toast.info("AI Route Agent is analyzing logistics...");
+    try {
+      const generated = await generateRouteEvents(origin, dest, type);
+      if (Array.isArray(generated) && generated.length > 0) {
+        setEvents(generated.map(g => ({
+          status: g.status || "Item Processed at Origin Warehouse",
+          location: g.location || "",
+          description: g.description || "",
+          event_time: g.event_time ? new Date(g.event_time).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16)
+        })));
+        toast.success("AI generated a highly realistic route!");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "AI failed to generate route");
+    } finally {
+      setGeneratingAI(false);
+    }
   }
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -131,11 +165,19 @@ function NewShipmentPage() {
         </section>
 
         <section className="rounded-2xl border bg-card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold">Tracking events</h2>
-            <button type="button" onClick={addEvent} className="inline-flex items-center gap-1 rounded-md bg-gradient-gold px-3 py-1.5 text-xs font-semibold"><Plus className="h-3 w-3" />Add event</button>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display text-lg font-bold">Tracking events</h2>
+              <p className="mt-1 text-xs text-muted-foreground">Timeline entries shown to customers. Last one becomes current status.</p>
+            </div>
+            <div className="flex gap-2">
+              <button type="button" onClick={handleAIGenerate} disabled={generatingAI} className="inline-flex items-center gap-1.5 rounded-md border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-600 hover:bg-purple-500/20 disabled:opacity-50">
+                {generatingAI ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                {generatingAI ? "Agent is routing..." : "Ask AI Agent"}
+              </button>
+              <button type="button" onClick={addEvent} className="inline-flex items-center gap-1 rounded-md bg-gradient-gold px-3 py-1.5 text-xs font-semibold"><Plus className="h-3 w-3" />Add event</button>
+            </div>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Timeline entries shown to customers. Last one becomes current status.</p>
 
           <div className="mt-4 space-y-4">
             {events.map((ev, i) => (
