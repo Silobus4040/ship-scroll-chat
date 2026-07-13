@@ -20,8 +20,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TrackNumberRouteImport } from './routes/track.$number'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAdminShipmentsNewRouteImport } from './routes/_authenticated/admin.shipments.new'
-import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin.shipments.$id'
+import { Route as AuthenticatedAdminShipmentsNewRouteImport } from './routes/_authenticated/admin_.shipments.new'
+import { Route as AuthenticatedAdminShipmentsIdRouteImport } from './routes/_authenticated/admin_.shipments.$id'
 
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
@@ -79,15 +79,15 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 } as any)
 const AuthenticatedAdminShipmentsNewRoute =
   AuthenticatedAdminShipmentsNewRouteImport.update({
-    id: '/shipments/new',
-    path: '/shipments/new',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/admin_/shipments/new',
+    path: '/admin/shipments/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminShipmentsIdRoute =
   AuthenticatedAdminShipmentsIdRouteImport.update({
-    id: '/shipments/$id',
-    path: '/shipments/$id',
-    getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/admin_/shipments/$id',
+    path: '/admin/shipments/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -99,7 +99,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRouteWithChildren
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
   '/track/$number': typeof TrackNumberRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
@@ -113,7 +113,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRouteWithChildren
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
   '/track/$number': typeof TrackNumberRoute
   '/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
   '/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
@@ -129,10 +129,10 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRouteWithChildren
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/track/$number': typeof TrackNumberRoute
-  '/_authenticated/admin/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
-  '/_authenticated/admin/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
+  '/_authenticated/admin_/shipments/$id': typeof AuthenticatedAdminShipmentsIdRoute
+  '/_authenticated/admin_/shipments/new': typeof AuthenticatedAdminShipmentsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -176,8 +176,8 @@ export interface FileRouteTypes {
     | '/track'
     | '/_authenticated/admin'
     | '/track/$number'
-    | '/_authenticated/admin/shipments/$id'
-    | '/_authenticated/admin/shipments/new'
+    | '/_authenticated/admin_/shipments/$id'
+    | '/_authenticated/admin_/shipments/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -271,42 +271,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/shipments/new': {
-      id: '/_authenticated/admin/shipments/new'
-      path: '/shipments/new'
+    '/_authenticated/admin_/shipments/new': {
+      id: '/_authenticated/admin_/shipments/new'
+      path: '/admin/shipments/new'
       fullPath: '/admin/shipments/new'
       preLoaderRoute: typeof AuthenticatedAdminShipmentsNewRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/shipments/$id': {
-      id: '/_authenticated/admin/shipments/$id'
-      path: '/shipments/$id'
+    '/_authenticated/admin_/shipments/$id': {
+      id: '/_authenticated/admin_/shipments/$id'
+      path: '/admin/shipments/$id'
       fullPath: '/admin/shipments/$id'
       preLoaderRoute: typeof AuthenticatedAdminShipmentsIdRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticatedAdminRouteChildren {
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAdminShipmentsIdRoute: typeof AuthenticatedAdminShipmentsIdRoute
   AuthenticatedAdminShipmentsNewRoute: typeof AuthenticatedAdminShipmentsNewRoute
 }
 
-const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAdminShipmentsIdRoute: AuthenticatedAdminShipmentsIdRoute,
   AuthenticatedAdminShipmentsNewRoute: AuthenticatedAdminShipmentsNewRoute,
-}
-
-const AuthenticatedAdminRouteWithChildren =
-  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
-
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-}
-
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -336,13 +327,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

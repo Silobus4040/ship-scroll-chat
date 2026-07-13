@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/shipments/$id")({
+export const Route = createFileRoute("/_authenticated/admin_/shipments/$id")({
   head: () => ({ meta: [{ title: "Edit Shipment — Zipco Admin" }, { name: "robots", content: "noindex" }] }),
   component: EditShipmentPage,
 });

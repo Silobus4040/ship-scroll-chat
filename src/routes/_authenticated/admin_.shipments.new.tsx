@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/admin/shipments/new")({
+export const Route = createFileRoute("/_authenticated/admin_/shipments/new")({
   head: () => ({ meta: [{ title: "New Shipment — Zipco Admin" }, { name: "robots", content: "noindex" }] }),
   component: NewShipmentPage,
 });
