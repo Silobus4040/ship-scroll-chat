@@ -144,7 +144,7 @@ function EditShipmentPage() {
           <div className="flex gap-2">
             <button type="button" onClick={handleAIGenerate} disabled={generatingAI} className="inline-flex items-center gap-1.5 rounded-md border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-600 hover:bg-purple-500/20 disabled:opacity-50">
               {generatingAI ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-              {generatingAI ? "Agent is routing..." : "Ask AI Agent"}
+              {generatingAI ? "Agent is routing..." : "AI Shipping Route Agent"}
             </button>
             <button onClick={() => setEvents((e) => [...e, { status: "", location: "", description: "", event_time: new Date().toISOString().slice(0, 16) }])} className="inline-flex items-center gap-1 rounded-md bg-gradient-gold px-3 py-1.5 text-xs font-semibold"><Plus className="h-3 w-3" />Add</button>
           </div>
