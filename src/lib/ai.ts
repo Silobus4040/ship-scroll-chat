@@ -17,7 +17,8 @@ const RouteEventsOutput = z.object({
       status: z.string(),
       location: z.string(),
       description: z.string(),
-      event_time: z.string(),
+      event_time: z.string().optional(),
+      timestamp: z.string().optional(),
     }),
   ),
 });

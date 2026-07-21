@@ -2,7 +2,8 @@ export type GeneratedRouteEvent = {
   status: string;
   location: string;
   description: string;
-  event_time: string;
+  event_time?: string;
+  timestamp?: string;
 };
 
 export function buildRouteEventsPrompt(origin: string, destination: string, serviceType: string) {
@@ -28,7 +29,9 @@ export function normalizeRouteEvents(events: GeneratedRouteEvent[]) {
       status: event.status.trim(),
       location: event.location?.trim() || "",
       description: event.description?.trim() || "",
-      event_time: Number.isNaN(Date.parse(event.event_time)) ? new Date().toISOString() : new Date(event.event_time).toISOString(),
+      event_time: Number.isNaN(Date.parse(event.event_time || event.timestamp || ""))
+        ? new Date().toISOString()
+        : new Date(event.event_time || event.timestamp || "").toISOString(),
     }));
 }
 
