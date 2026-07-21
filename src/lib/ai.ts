@@ -48,7 +48,7 @@ export const generateRouteEvents = createServerFn({ method: "POST" })
       return normalizeRouteEvents(output.events);
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
-        const fallback = parseRouteEventsFallback(error.text);
+        const fallback = parseRouteEventsFallback(error.text ?? "");
         if (fallback?.length) return fallback;
       }
 
