@@ -56,3 +56,4 @@ Output ONLY a valid JSON array (or the error JSON object), with no markdown form
       console.error("Failed to parse AI output:", text);
       throw new Error("AI returned invalid JSON format.");
     }
+  });
