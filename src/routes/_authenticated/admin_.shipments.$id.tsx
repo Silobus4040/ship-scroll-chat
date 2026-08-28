@@ -50,6 +50,7 @@ function EditShipmentPage() {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [saving, setSaving] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   useEffect(() => {
     supabase.from("shipments").select("*").eq("id", id).maybeSingle().then(({ data }) => setShipment(data));
@@ -67,6 +68,17 @@ function EditShipmentPage() {
 
   async function save() {
     setSaving(true);
+    
+    let consignment_photo_url = shipment.consignment_photo_url;
+    if (photoFile && photoFile.size > 0) {
+      const ext = photoFile.name.split('.').pop();
+      const path = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("consignment_photos").upload(path, photoFile);
+      if (uploadError) { toast.error("Photo upload failed: " + uploadError.message); setSaving(false); return; }
+      const { data: publicUrlData } = supabase.storage.from("consignment_photos").getPublicUrl(path);
+      consignment_photo_url = publicUrlData.publicUrl;
+    }
+
     const patch = {
       tracking_number: shipment.tracking_number,
       sender_name: shipment.sender_name, recipient_name: shipment.recipient_name,
@@ -76,6 +88,7 @@ function EditShipmentPage() {
       progress_percent: Number(shipment.progress_percent) || 0,
       estimated_delivery: shipment.estimated_delivery,
       weight_kg: shipment.weight_kg, package_type: shipment.package_type,
+      consignment_photo_url,
     };
     const { error } = await supabase.from("shipments").update(patch).eq("id", id);
     if (error) { toast.error(error.message); setSaving(false); return; }
@@ -134,6 +147,11 @@ function EditShipmentPage() {
           <FI label="ETA" type="date" value={shipment.estimated_delivery ?? ""} onChange={(v) => upd("estimated_delivery", v || null)} />
           <FI label="Weight (kg)" type="number" value={String(shipment.weight_kg ?? "")} onChange={(v) => upd("weight_kg", v ? Number(v) : null)} />
           <FI label="Package Type" value={shipment.package_type ?? ""} onChange={(v) => upd("package_type", v)} />
+          <div>
+            <label className="block text-sm font-medium">Consignment Photo</label>
+            <input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            {shipment.consignment_photo_url && !photoFile && <p className="mt-1 text-xs text-muted-foreground">Current photo uploaded. Uploading a new one will replace it.</p>}
+          </div>
         </div>
       </section>
 

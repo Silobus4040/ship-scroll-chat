@@ -18,7 +18,7 @@ type Shipment = {
   id: string; tracking_number: string; sender_name: string; recipient_name: string;
   origin: string; destination: string; service_type: string; current_status: string;
   progress_percent: number; estimated_delivery: string | null; shipped_at: string | null;
-  weight_kg: number | null; package_type: string | null;
+  weight_kg: number | null; package_type: string | null; consignment_photo_url: string | null;
 };
 type Event = { id: string; status: string; location: string | null; description: string | null; event_time: string };
 
@@ -65,6 +65,10 @@ function TrackingDetail() {
   if (!shipment) return null;
 
   const pct = shipment.progress_percent ?? 0;
+
+  const currentLocation = events.length > 0 && events[events.length - 1].location 
+    ? events[events.length - 1].location 
+    : (shipment.destination || shipment.origin);
 
   return (
     <>
@@ -141,6 +145,29 @@ function TrackingDetail() {
               {shipment.package_type && <Row label="Package"><span className="flex items-center gap-1"><Package className="h-4 w-4 text-accent" />{shipment.package_type}</span></Row>}
               {shipment.estimated_delivery && <Row label="ETA"><span className="flex items-center gap-1"><Clock className="h-4 w-4 text-accent" />{new Date(shipment.estimated_delivery).toLocaleDateString()}</span></Row>}
             </dl>
+          </div>
+          {shipment.consignment_photo_url && (
+            <div className="rounded-xl border bg-card p-5">
+              <h3 className="font-display font-bold">Consignment Photo</h3>
+              <div className="mt-4 overflow-hidden rounded-lg">
+                <img src={shipment.consignment_photo_url} alt="Consignment" className="w-full h-auto object-cover" />
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-xl border bg-card p-5">
+            <h3 className="font-display font-bold">Live Location</h3>
+            <div className="mt-4 overflow-hidden rounded-lg h-64 bg-muted">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                frameBorder="0" 
+                scrolling="no" 
+                marginHeight={0} 
+                marginWidth={0} 
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(currentLocation || "")}&t=&z=10&ie=UTF8&iwloc=&output=embed`}
+              />
+            </div>
           </div>
         </aside>
       </section>

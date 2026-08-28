@@ -96,6 +96,19 @@ function NewShipmentPage() {
     e.preventDefault();
     setSaving(true);
     const fd = new FormData(e.currentTarget);
+    
+    let consignment_photo_url = null;
+    const photoFile = fd.get("consignment_photo") as File;
+    if (photoFile && photoFile.size > 0) {
+      const ext = photoFile.name.split('.').pop();
+      const path = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("consignment_photos").upload(path, photoFile);
+      if (uploadError) { toast.error("Photo upload failed: " + uploadError.message); setSaving(false); return; }
+      
+      const { data: publicUrlData } = supabase.storage.from("consignment_photos").getPublicUrl(path);
+      consignment_photo_url = publicUrlData.publicUrl;
+    }
+
     const shipment = {
       tracking_number: String(fd.get("tracking_number") || "").trim().toUpperCase(),
       sender_name: String(fd.get("sender_name") || ""),
@@ -112,6 +125,7 @@ function NewShipmentPage() {
       shipped_at: fd.get("shipped_at") ? new Date(String(fd.get("shipped_at"))).toISOString() : null,
       estimated_delivery: fd.get("estimated_delivery") ? String(fd.get("estimated_delivery")) : null,
       notes: String(fd.get("notes") || "") || null,
+      consignment_photo_url,
     };
 
     const { data: created, error } = await supabase.from("shipments").insert(shipment).select().single();
@@ -159,6 +173,7 @@ function NewShipmentPage() {
             <F name="shipped_at" label="Shipped At" type="datetime-local" />
             <F name="estimated_delivery" label="Estimated Delivery" type="date" />
             <F name="progress_percent" label="Progress %" type="number" min={0} max={100} defaultValue={0} />
+            <F name="consignment_photo" label="Consignment Photo" type="file" accept="image/*" />
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium">Notes</label>
               <textarea name="notes" rows={2} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
@@ -224,11 +239,11 @@ function NewShipmentPage() {
   );
 }
 
-function F({ name, label, type = "text", required, placeholder, defaultValue, step, min, max }: any) {
+function F({ name, label, type = "text", required, placeholder, defaultValue, step, min, max, accept }: any) {
   return (
     <div>
       <label className="block text-sm font-medium">{label}{required && " *"}</label>
-      <input name={name} type={type} step={step} min={min} max={max} required={required} placeholder={placeholder} defaultValue={defaultValue} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+      <input name={name} type={type} step={step} min={min} max={max} required={required} placeholder={placeholder} defaultValue={defaultValue} accept={accept} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
     </div>
   );
 }
