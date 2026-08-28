@@ -29,6 +29,7 @@ function TrackingDetail() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -37,16 +38,20 @@ function TrackingDetail() {
       const { data: s } = await supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle();
       if (cancelled) return;
       if (!s) { setNotFound(true); setLoading(false); return; }
-      setShipment(s as Shipment);
+      const row = s as Shipment;
+      setShipment(row);
+      setPhotoUrl(await getConsignmentPhotoUrl(row.consignment_photo_url));
       const { data: ev } = await supabase.from("shipment_events").select("*").eq("shipment_id", s.id).order("event_time", { ascending: true });
       if (!cancelled) { setEvents((ev as Event[]) ?? []); setLoading(false); }
     })();
 
     const ch = supabase.channel(`ship-${number}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "shipment_events" }, () => {
-        supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle().then(({ data }) => {
+        supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle().then(async ({ data }) => {
           if (!data) return;
-          setShipment(data as Shipment);
+          const row = data as Shipment;
+          setShipment(row);
+          setPhotoUrl(await getConsignmentPhotoUrl(row.consignment_photo_url));
           supabase.from("shipment_events").select("*").eq("shipment_id", data.id).order("event_time", { ascending: true }).then(({ data: ev }) => setEvents((ev as Event[]) ?? []));
         });
       }).subscribe();
