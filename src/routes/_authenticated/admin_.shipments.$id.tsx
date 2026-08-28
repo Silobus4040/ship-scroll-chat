@@ -52,9 +52,15 @@ function EditShipmentPage() {
   const [saving, setSaving] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from("shipments").select("*").eq("id", id).maybeSingle().then(({ data }) => setShipment(data));
+    supabase.from("shipments").select("*").eq("id", id).maybeSingle().then(({ data }) => {
+      if (data) {
+        setShipment(data);
+        getConsignmentPhotoUrl(data.consignment_photo_url).then(setPhotoUrl);
+      }
+    });
     supabase.from("shipment_events").select("*").eq("shipment_id", id).order("event_time").then(({ data }) => {
       setEvents(((data as any[]) ?? []).map((e) => ({
         id: e.id, status: e.status, location: e.location ?? "", description: e.description ?? "",
