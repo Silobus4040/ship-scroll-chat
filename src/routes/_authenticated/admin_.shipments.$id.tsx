@@ -155,8 +155,15 @@ function EditShipmentPage() {
           <FI label="Package Type" value={shipment.package_type ?? ""} onChange={(v) => upd("package_type", v)} />
           <div>
             <label className="block text-sm font-medium">Consignment Photo</label>
-            <input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
-            {shipment.consignment_photo_url && !photoFile && <p className="mt-1 text-xs text-muted-foreground">Current photo uploaded. Uploading a new one will replace it.</p>}
+            <input type="file" accept="image/*" onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              setPhotoFile(file);
+              if (file) {
+                setPhotoUrl(URL.createObjectURL(file));
+              }
+            }} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            {photoUrl && <img src={photoUrl} alt="Consignment preview" className="mt-3 h-40 w-full rounded-lg object-cover" />}
+            {!photoFile && shipment.consignment_photo_url && <p className="mt-1 text-xs text-muted-foreground">Current photo uploaded. Uploading a new one will replace it.</p>}
           </div>
         </div>
       </section>
