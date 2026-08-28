@@ -152,11 +152,11 @@ function TrackingDetail() {
               {shipment.estimated_delivery && <Row label="ETA"><span className="flex items-center gap-1"><Clock className="h-4 w-4 text-accent" />{new Date(shipment.estimated_delivery).toLocaleDateString()}</span></Row>}
             </dl>
           </div>
-          {shipment.consignment_photo_url && (
+          {photoUrl && (
             <div className="rounded-xl border bg-card p-5">
               <h3 className="font-display font-bold">Consignment Photo</h3>
               <div className="mt-4 overflow-hidden rounded-lg">
-                <img src={shipment.consignment_photo_url} alt="Consignment" className="w-full h-auto object-cover" />
+                <img src={photoUrl} alt="Consignment" className="w-full h-auto object-cover" />
               </div>
             </div>
           )}
