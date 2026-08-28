@@ -161,6 +161,7 @@ export type Database = {
       }
       shipments: {
         Row: {
+          consignment_photo_url: string | null
           created_at: string
           created_by: string | null
           current_status: string
@@ -182,6 +183,7 @@ export type Database = {
           weight_kg: number | null
         }
         Insert: {
+          consignment_photo_url?: string | null
           created_at?: string
           created_by?: string | null
           current_status?: string
@@ -203,6 +205,7 @@ export type Database = {
           weight_kg?: number | null
         }
         Update: {
+          consignment_photo_url?: string | null
           created_at?: string
           created_by?: string | null
           current_status?: string
