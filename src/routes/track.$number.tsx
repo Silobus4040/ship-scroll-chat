@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Ship, MapPin, CheckCircle2, Circle, Package, Clock } from "lucide-react";
+import { getConsignmentPhotoUrl } from "@/lib/storage-url";
 
 export const Route = createFileRoute("/track/$number")({
   head: ({ params }) => ({
