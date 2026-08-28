@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Sparkles, Loader2 } from "lucide-react";
 import { generateRouteEvents } from "@/lib/ai";
+import { getConsignmentPhotoUrl } from "@/lib/storage-url";
 
 export const Route = createFileRoute("/_authenticated/admin_/shipments/$id")({
   head: () => ({ meta: [{ title: "Edit Shipment — Zipco Admin" }, { name: "robots", content: "noindex" }] }),
@@ -51,9 +52,15 @@ function EditShipmentPage() {
   const [saving, setSaving] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from("shipments").select("*").eq("id", id).maybeSingle().then(({ data }) => setShipment(data));
+    supabase.from("shipments").select("*").eq("id", id).maybeSingle().then(({ data }) => {
+      if (data) {
+        setShipment(data);
+        getConsignmentPhotoUrl(data.consignment_photo_url).then(setPhotoUrl);
+      }
+    });
     supabase.from("shipment_events").select("*").eq("shipment_id", id).order("event_time").then(({ data }) => {
       setEvents(((data as any[]) ?? []).map((e) => ({
         id: e.id, status: e.status, location: e.location ?? "", description: e.description ?? "",
@@ -75,8 +82,7 @@ function EditShipmentPage() {
       const path = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
       const { error: uploadError } = await supabase.storage.from("consignment_photos").upload(path, photoFile);
       if (uploadError) { toast.error("Photo upload failed: " + uploadError.message); setSaving(false); return; }
-      const { data: publicUrlData } = supabase.storage.from("consignment_photos").getPublicUrl(path);
-      consignment_photo_url = publicUrlData.publicUrl;
+      consignment_photo_url = path;
     }
 
     const patch = {
@@ -149,8 +155,15 @@ function EditShipmentPage() {
           <FI label="Package Type" value={shipment.package_type ?? ""} onChange={(v) => upd("package_type", v)} />
           <div>
             <label className="block text-sm font-medium">Consignment Photo</label>
-            <input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
-            {shipment.consignment_photo_url && !photoFile && <p className="mt-1 text-xs text-muted-foreground">Current photo uploaded. Uploading a new one will replace it.</p>}
+            <input type="file" accept="image/*" onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              setPhotoFile(file);
+              if (file) {
+                setPhotoUrl(URL.createObjectURL(file));
+              }
+            }} className="mt-1.5 w-full rounded-md border bg-background px-3 py-2 text-sm" />
+            {photoUrl && <img src={photoUrl} alt="Consignment preview" className="mt-3 h-40 w-full rounded-lg object-cover" />}
+            {!photoFile && shipment.consignment_photo_url && <p className="mt-1 text-xs text-muted-foreground">Current photo uploaded. Uploading a new one will replace it.</p>}
           </div>
         </div>
       </section>

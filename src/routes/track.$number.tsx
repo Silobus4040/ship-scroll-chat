@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Ship, MapPin, CheckCircle2, Circle, Package, Clock } from "lucide-react";
+import { getConsignmentPhotoUrl } from "@/lib/storage-url";
 
 export const Route = createFileRoute("/track/$number")({
   head: ({ params }) => ({
@@ -28,6 +29,7 @@ function TrackingDetail() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,16 +38,20 @@ function TrackingDetail() {
       const { data: s } = await supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle();
       if (cancelled) return;
       if (!s) { setNotFound(true); setLoading(false); return; }
-      setShipment(s as Shipment);
+      const row = s as Shipment;
+      setShipment(row);
+      setPhotoUrl(await getConsignmentPhotoUrl(row.consignment_photo_url));
       const { data: ev } = await supabase.from("shipment_events").select("*").eq("shipment_id", s.id).order("event_time", { ascending: true });
       if (!cancelled) { setEvents((ev as Event[]) ?? []); setLoading(false); }
     })();
 
     const ch = supabase.channel(`ship-${number}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "shipment_events" }, () => {
-        supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle().then(({ data }) => {
+        supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle().then(async ({ data }) => {
           if (!data) return;
-          setShipment(data as Shipment);
+          const row = data as Shipment;
+          setShipment(row);
+          setPhotoUrl(await getConsignmentPhotoUrl(row.consignment_photo_url));
           supabase.from("shipment_events").select("*").eq("shipment_id", data.id).order("event_time", { ascending: true }).then(({ data: ev }) => setEvents((ev as Event[]) ?? []));
         });
       }).subscribe();
@@ -146,11 +152,11 @@ function TrackingDetail() {
               {shipment.estimated_delivery && <Row label="ETA"><span className="flex items-center gap-1"><Clock className="h-4 w-4 text-accent" />{new Date(shipment.estimated_delivery).toLocaleDateString()}</span></Row>}
             </dl>
           </div>
-          {shipment.consignment_photo_url && (
+          {photoUrl && (
             <div className="rounded-xl border bg-card p-5">
               <h3 className="font-display font-bold">Consignment Photo</h3>
               <div className="mt-4 overflow-hidden rounded-lg">
-                <img src={shipment.consignment_photo_url} alt="Consignment" className="w-full h-auto object-cover" />
+                <img src={photoUrl} alt="Consignment" className="w-full h-auto object-cover" />
               </div>
             </div>
           )}
