@@ -104,9 +104,7 @@ function NewShipmentPage() {
       const path = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
       const { error: uploadError } = await supabase.storage.from("consignment_photos").upload(path, photoFile);
       if (uploadError) { toast.error("Photo upload failed: " + uploadError.message); setSaving(false); return; }
-      
-      const { data: publicUrlData } = supabase.storage.from("consignment_photos").getPublicUrl(path);
-      consignment_photo_url = publicUrlData.publicUrl;
+      consignment_photo_url = path;
     }
 
     const shipment = {
