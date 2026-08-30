@@ -24,13 +24,22 @@ function AdminPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      setUserId(u.user.id);
-      const { data: role } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id).eq("role", "admin").maybeSingle();
-      setIsAdmin(!!role);
+      try {
+        const { data: u, error } = await supabase.auth.getUser();
+        if (error || !u.user) {
+          setIsAdmin(false);
+          nav({ to: "/auth", replace: true });
+          return;
+        }
+        setUserId(u.user.id);
+        const { data: role } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id).eq("role", "admin").maybeSingle();
+        setIsAdmin(!!role);
+      } catch {
+        setIsAdmin(false);
+        nav({ to: "/auth", replace: true });
+      }
     })();
-  }, []);
+  }, [nav]);
 
   useEffect(() => {
     if (!isAdmin) return;
