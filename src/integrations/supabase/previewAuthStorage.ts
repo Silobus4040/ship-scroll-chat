@@ -7,6 +7,8 @@ export function brokeredPreviewStorage() {
   const host = location.hostname;
   const PREVIEW_ZONES = ['lovableproject.com', 'lovableproject-dev.com', 'lovable.app', 'gpt-eng.com', 'gptengineer.run'];
   const onPreviewZone = PREVIEW_ZONES.some((z) => host === z || host.endsWith('.' + z));
+  // On production (not a Lovable preview), always use localStorage directly
+  if (!onPreviewZone) return localStorage;
   // Read the id only from non-user-controlled host positions, so a user-named
   // preview--<name> host can't smuggle another project's id.
   const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
