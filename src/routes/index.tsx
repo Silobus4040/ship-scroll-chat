@@ -48,46 +48,32 @@ function HomePage() {
           height={1088}
           className="absolute inset-0 h-full w-full object-cover will-change-transform"
           style={{ x: shipX, y: shipY, scale: shipScale }}
-          initial={{ opacity: 0, scale: 1.08 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, ease: "easeOut" }}
         />
         {/* Gradient overlay */}
-        <motion.div
+        <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(10,25,48,0.25) 0%, rgba(10,25,48,0.85) 100%)", opacity: overlay }}
+          style={{ background: "linear-gradient(180deg, rgba(10,25,48,0.25) 0%, rgba(10,25,48,0.85) 100%)" }}
           aria-hidden
         />
         {/* Subtle animated wave line at bottom */}
-        <motion.div
+        <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-navy to-transparent"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}
           aria-hidden
         />
 
         <div className="relative z-10 container-wide flex h-full flex-col justify-center text-navy-foreground">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
-            className="text-sm font-semibold uppercase tracking-[0.3em] text-gold"
-          >
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gold">
             Global Freight · Delivered
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.8 }}
-            className="mt-4 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-6xl md:text-7xl"
-          >
+          </p>
+          <h1 className="mt-4 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-6xl md:text-7xl">
             The world's cargo, <span className="text-gold">moved with precision.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.7 }}
-            className="mt-6 max-w-xl text-lg text-navy-foreground/85"
-          >
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-navy-foreground/85">
             Ocean, air and land freight solutions trusted by thousands of shippers across six continents.
-          </motion.p>
+          </p>
 
           {/* Tracking bar */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.95, duration: 0.7 }}
+          <form
             onSubmit={(e) => { e.preventDefault(); if (track.trim()) navigate({ to: "/track/$number", params: { number: track.trim() } }); }}
             className="mt-10 flex max-w-xl flex-col gap-3 rounded-xl bg-white/10 p-3 backdrop-blur sm:flex-row"
           >
@@ -103,7 +89,7 @@ function HomePage() {
             <button className="rounded-lg bg-gradient-gold px-6 py-3 text-sm font-semibold shadow-gold transition hover:opacity-90">
               Track Shipment
             </button>
-          </motion.form>
+          </form>
         </div>
       </section>
 
