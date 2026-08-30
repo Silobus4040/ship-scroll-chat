@@ -32,7 +32,8 @@ function TrackPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (n.trim()) nav({ to: "/track/$number", params: { number: n.trim() } });
+                const trackingNumber = n.trim().toUpperCase();
+                if (trackingNumber) nav({ to: "/track/$number", params: { number: trackingNumber } });
               }}
               className="mt-8 flex max-w-xl flex-col gap-3 rounded-xl bg-white/10 p-3 backdrop-blur sm:flex-row"
             >

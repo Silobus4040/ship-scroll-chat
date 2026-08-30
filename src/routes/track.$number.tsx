@@ -25,6 +25,7 @@ type Event = { id: string; status: string; location: string | null; description:
 
 function TrackingDetail() {
   const { number } = Route.useParams();
+  const trackingNumber = number.trim().toUpperCase();
   const [shipment, setShipment] = useState<Shipment | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,8 @@ function TrackingDetail() {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const { data: s } = await supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle();
+      setNotFound(false);
+      const { data: s } = await supabase.from("shipments").select("*").eq("tracking_number", trackingNumber).maybeSingle();
       if (cancelled) return;
       if (!s) { setNotFound(true); setLoading(false); return; }
       const row = s as Shipment;
@@ -45,9 +47,9 @@ function TrackingDetail() {
       if (!cancelled) { setEvents((ev as Event[]) ?? []); setLoading(false); }
     })();
 
-    const ch = supabase.channel(`ship-${number}`)
+    const ch = supabase.channel(`ship-${trackingNumber}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "shipment_events" }, () => {
-        supabase.from("shipments").select("*").eq("tracking_number", number).maybeSingle().then(async ({ data }) => {
+        supabase.from("shipments").select("*").eq("tracking_number", trackingNumber).maybeSingle().then(async ({ data }) => {
           if (!data) return;
           const row = data as Shipment;
           setShipment(row);
@@ -56,7 +58,7 @@ function TrackingDetail() {
         });
       }).subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
-  }, [number]);
+  }, [trackingNumber]);
 
   if (loading) return <div className="container-wide py-24 text-center text-muted-foreground">Loading tracking data…</div>;
 
